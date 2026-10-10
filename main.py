@@ -3,11 +3,14 @@ from dialog import Dialogue
 from llm import LLM
 from tts import TTSModel
 from dotenv import load_dotenv
+from bootstrap import prepare_run
 
 
 load_dotenv()
 
 def main():
+    log_path = prepare_run()
+
     llm_model = LLM(model_title="deepseek/deepseek-v3.2")
     tts_model = TTSModel()
 
@@ -18,7 +21,7 @@ def main():
     )
 
     agent2 = Agent(
-        personality_short_name="xenia",
+        personality_short_name="eugene",
         llm_model=llm_model,
         tts_model=tts_model
     )
@@ -26,12 +29,14 @@ def main():
     dialogue = Dialogue(
         agent1=agent1,
         agent2=agent2,
-        topics="Поговорите на тему поэзии. Что для вас поэзия? Какой любимый поэт?",
+        topics="Верна ли гипотеза Римана?",
         max_turns=8
     )
 
     dialogue_history = dialogue.main_loop()
-    print(dialogue_history)
+
+    with open(log_path, 'w') as file:
+        file.write(dialogue_history)
 
 if __name__ == "__main__":
     main()

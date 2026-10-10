@@ -1,5 +1,7 @@
 from agent import Agent
-from pathlib import Path
+import threading
+from queue import Queue
+
 
 class Dialogue:
     def __init__(
@@ -31,37 +33,59 @@ class Dialogue:
         return conversation_history
 
     def main_loop(self):
-        agent1_personality_info = self.agent1.personality.get_personality_info()
-        agent2_personality_info = self.agent2.personality.get_personality_info()
+        llm_queue = Queue()
+        tts_queue = Queue()
 
-        while self.turns < self.max_turns:
-            conversation_history = self.stringify_conversation_history()
-            turn_wav_filename = f"wav/turn{self.turns + 1}.wav"
-            if self.whose_turn_now == 1:
-                response = self.agent1.say(conversation_history, agent2_personality_info)
-                print(self.whose_turn_now, response, '\n\n')
-                self.agent1.tts_model.synthesize_speech(
+        def llm_worker():
+            history = []
+            for turn_idx in range(self.max_turns):
+                agent = self.agent1 if self.whose_turn_now == 1 else self.agent2
+                opponent = self.agent2 if self.whose_turn_now == 1 else self.agent1
+
+                hist_str = self.stringify_conversation_history()
+                opponent_info = opponent.personality.get_personality_info()
+
+                response = agent.say(hist_str, opponent_info)
+                print(f"{turn_idx}. {agent.personality.short_name}: {response}\n")
+
+                history.append((self.whose_turn_now, response))
+                llm_queue.put((turn_idx, agent, response))
+
+                self.whose_turn_now = 2 if self.whose_turn_now == 1 else 1
+
+            self.history = history
+            llm_queue.put('END')
+
+        def tts_worker():
+            while True:
+                item = llm_queue.get()
+                if item == 'END':
+                    tts_queue.put('END')
+                    return
+                turn_idx, agent, response = item
+                wav = f"wav/turn{turn_idx + 1}.wav"
+                agent.tts_model.synthesize_speech(
                     response,
-                    speaker=self.agent1.personality.short_name,
-                    output=turn_wav_filename
+                    speaker=agent.personality.short_name,
+                    output=wav,
                 )
+                tts_queue.put((turn_idx, agent, wav))
 
-                self.agent1.speak(turn_wav_filename)
-            else:
-                response = self.agent2.say(conversation_history, agent1_personality_info)
-                print(f'{self.agent2.personality.short_name}: {response}\n\n')
-                self.agent2.tts_model.synthesize_speech(
-                    response,
-                    speaker=self.agent2.personality.short_name,
-                    output=turn_wav_filename
-                )
-                
-                self.agent2.speak(turn_wav_filename)
+        t_llm = threading.Thread(target=llm_worker, daemon=True)
+        t_tts = threading.Thread(target=tts_worker, daemon=True)
 
-            turn = (self.whose_turn_now, response)
-            print(self.whose_turn_now, response, '\n\n')
-            self.history.append(turn)
+        t_llm.start()
+        t_tts.start()
+
+        while True:
+            item = tts_queue.get()
+            if item == 'END':
+                break
+            _, agent, wav = item
+            agent.speak(wav)
             self.turns += 1
-            self.whose_turn_now = 2 if self.whose_turn_now == 1 else 1
 
-        return self.history
+        t_llm.join()
+        t_tts.join()
+
+        return self.stringify_conversation_history()
