@@ -13,7 +13,7 @@ class LLM:
             base_url=self.base_url
         )
 
-    def answer(self, prompt: str) -> str:
+    def generate_response(self, prompt: str) -> str:
         response = self.client.chat.completions.create(
             model=self.model_title,
             messages=[

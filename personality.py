@@ -11,3 +11,6 @@ class Personality:
         self.profession = me.profession
         self.language = me.language
         self.info = me.info
+
+    def get_personality_info(self):
+        return f"Name: {self.full_name}\nAge: {self.age}\nProfession: {self.profession}\nLanguage: {self.language}\nInfo: {self.info}"
