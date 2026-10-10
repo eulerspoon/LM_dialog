@@ -1,22 +1,26 @@
 from agent import Agent
 from dialog import Dialogue
 from llm import LLM
-from personality import Personality
+from tts import TTSModel
 from dotenv import load_dotenv
+
 
 load_dotenv()
 
 def main():
     llm_model = LLM(model_title="deepseek/deepseek-v3.2")
-    print('OK')
+    tts_model = TTSModel()
+
     agent1 = Agent(
-        personality_short_name="max",
-        llm_model=llm_model
+        personality_short_name="aidar",
+        llm_model=llm_model,
+        tts_model=tts_model
     )
 
     agent2 = Agent(
-        personality_short_name="elena",
-        llm_model=llm_model
+        personality_short_name="xenia",
+        llm_model=llm_model,
+        tts_model=tts_model
     )
 
     dialogue = Dialogue(

@@ -1,9 +1,16 @@
 from personality import Personality
 from llm import LLM
 from tts import TTSModel
+import sounddevice as sd
+import soundfile as sf
 
 class Agent:
-    def __init__(self, personality_short_name: str, llm_model: LLM, tts_model: TTSModel = None):
+    def __init__(
+        self,
+        personality_short_name: str,
+        llm_model: LLM,
+        tts_model: TTSModel = None
+    ):
         self.personality = Personality(short_name=personality_short_name)
 
         self.llm_model = llm_model
@@ -26,7 +33,13 @@ class Agent:
             В твоём ответе должны быть только слова, которые ты произнесёшь. Не добавляй никаких пояснений, комментариев или описаний действий.
             Не забывай соблюбать правила русского языка и пунктуации. Если в описании твоей личности есть черты грубого характера,
             то в твоих репликах могут быть грубые слова. Старайся, чтобы стиль ответа соответствовал твоей личности, возрасту и характеру.
+            Старайся выражаться ёмко, передавая главные мысли в аргументах. Пусть в ответе будет 1-4 предложения.
         '''
 
         response = self.llm_model.generate_response(full_input)
         return response
+
+    def speak(self, filename: str):
+        data, fs = sf.read(filename, dtype="float32")
+        sd.play(data, fs)
+        sd.wait()

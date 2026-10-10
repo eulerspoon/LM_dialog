@@ -1,6 +1,5 @@
 from agent import Agent
-import time
-
+from pathlib import Path
 
 class Dialogue:
     def __init__(
@@ -36,12 +35,28 @@ class Dialogue:
         agent2_personality_info = self.agent2.personality.get_personality_info()
 
         while self.turns < self.max_turns:
-            time.sleep(2)
             conversation_history = self.stringify_conversation_history()
+            turn_wav_filename = f"wav/turn{self.turns + 1}.wav"
             if self.whose_turn_now == 1:
                 response = self.agent1.say(conversation_history, agent2_personality_info)
+                print(self.whose_turn_now, response, '\n\n')
+                self.agent1.tts_model.synthesize_speech(
+                    response,
+                    speaker=self.agent1.personality.short_name,
+                    output=turn_wav_filename
+                )
+
+                self.agent1.speak(turn_wav_filename)
             else:
                 response = self.agent2.say(conversation_history, agent1_personality_info)
+                print(f'{self.agent2.personality.short_name}: {response}\n\n')
+                self.agent2.tts_model.synthesize_speech(
+                    response,
+                    speaker=self.agent2.personality.short_name,
+                    output=turn_wav_filename
+                )
+                
+                self.agent2.speak(turn_wav_filename)
 
             turn = (self.whose_turn_now, response)
             print(self.whose_turn_now, response, '\n\n')
