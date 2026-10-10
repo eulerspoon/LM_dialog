@@ -1,4 +1,5 @@
 from agent import Agent
+import time
 
 
 class Dialogue:
@@ -35,6 +36,7 @@ class Dialogue:
         agent2_personality_info = self.agent2.personality.get_personality_info()
 
         while self.turns < self.max_turns:
+            time.sleep(2)
             conversation_history = self.stringify_conversation_history()
             if self.whose_turn_now == 1:
                 response = self.agent1.say(conversation_history, agent2_personality_info)
@@ -42,7 +44,7 @@ class Dialogue:
                 response = self.agent2.say(conversation_history, agent1_personality_info)
 
             turn = (self.whose_turn_now, response)
-            print(response)
+            print(self.whose_turn_now, response, '\n\n')
             self.history.append(turn)
             self.turns += 1
             self.whose_turn_now = 2 if self.whose_turn_now == 1 else 1
