@@ -6,11 +6,11 @@ class Personality:
             me = json.load(file)[short_name]
 
         self.short_name = short_name
-        self.full_name = me.full_name
-        self.age = me.age
-        self.profession = me.profession
-        self.language = me.language
-        self.info = me.info
+        self.full_name = me['full_name']
+        self.age = me['age']
+        self.profession = me['profession']
+        self.language = me['language']
+        self.info = me['info']
 
     def get_personality_info(self):
         return f"Name: {self.full_name}\nAge: {self.age}\nProfession: {self.profession}\nLanguage: {self.language}\nInfo: {self.info}"

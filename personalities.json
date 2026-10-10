@@ -1,9 +1,16 @@
 {
-    "alex": {
-        "full_name": "Alexei Noskov",
+    "dan": {
+        "full_name": "Даниил Поляков",
         "age": 21,
         "profession": "CS student",
         "language": "russian",
-        "info": "none"
+        "info": "программирует, любить проектировать системы. грубый, ругается матом"
+    },
+    "alex": {
+        "full_name": "Алексей Смирнов",
+        "age": 22,
+        "profession": "Студент-математик",
+        "language": "russian",
+        "info": "любит математику и считает её лучшей в мире наукой. добрый"
     }
 }

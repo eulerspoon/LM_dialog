@@ -20,13 +20,14 @@ class Dialogue:
 
         self.turns = 0
         self.history = []
-        
+
     def stringify_conversation_history(self) -> str:
-        conversation_history = ""
+        conversation_history = "Тема диалога: " + self.topics + "\n\n"
         for agent, turn in self.history:
             short_name = self.agent1.personality.short_name if agent == 1 else self.agent2.personality.short_name
-            conversation_history += f"{short_name}: {turn}\n"
-    
+            turn_info = f"{short_name}: {turn}\n"
+            conversation_history += turn_info
+        
         return conversation_history
 
     def main_loop(self):
@@ -40,7 +41,9 @@ class Dialogue:
             else:
                 response = self.agent2.say(conversation_history, agent1_personality_info)
 
-            self.history.append((self.whose_turn_now, response))
+            turn = (self.whose_turn_now, response)
+            print(response)
+            self.history.append(turn)
             self.turns += 1
             self.whose_turn_now = 2 if self.whose_turn_now == 1 else 1
 
