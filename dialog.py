@@ -46,7 +46,7 @@ class Dialogue:
                 opponent_info = opponent.personality.get_personality_info()
 
                 response = agent.say(hist_str, opponent_info)
-                print(f"{turn_idx}. {agent.personality.short_name}: {response}\n")
+                print(f"{turn_idx + 1}. {agent.personality.short_name}: {response}\n")
 
                 history.append((self.whose_turn_now, response))
                 llm_queue.put((turn_idx, agent, response))
